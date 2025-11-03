@@ -12,7 +12,7 @@ Daphne Acher, Izze Lino, Vladimir Pierre, Javier Vargas, Bridjet Walker
 $ git clone https://github.com/TheGoumble/peersphere-electron.git
 ```
 
-2. Go to the dream-maids directory
+2. Go to the peersphere-electron directory
 ```bash
 $ cd PeerSphereFrontend
 ```
