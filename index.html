@@ -2,19 +2,52 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
+      content="default-src 'self' http://localhost:*; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:*"
     />
-    <meta
-      http-equiv="X-Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <title>Hello from Electron renderer!</title>
+    <title>PeerSphere</title>
   </head>
   <body>
-    <h1>Hello from Electron renderer! Yippie!</h1>
-    <p>👋</p>
+    <h1>PeerSphere</h1>
+    <div id="app">
+      <h2>Welcome to PeerSphere!</h2>
+      <p>Backend API should be running on http://localhost:8080</p>
+      <button onclick="testConnection()">Test API Connection</button>
+      <div id="result"></div>
+    </div>
+    <script src="api.js"></script>
+    <script>
+      const api = new PeerSphereAPI();
+      
+      async function testConnection() {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = '<p>Testing connection to backend...</p>';
+        
+        try {
+          // First, check if backend is running
+          const healthResponse = await api.healthCheck();
+          resultDiv.innerHTML = '<p style="color: green;">✓ Backend server is running!</p><p>Testing database connection...</p>';
+          
+          // Now try to register a test user (will fail if already exists, but that's okay)
+          try {
+            const response = await api.register('Test User', 'test@example.com', 'testpass');
+            resultDiv.innerHTML = '<p style="color: green;">✓ Backend server is running!</p><p style="color: green;">✓ Database connection successful!</p><p style="color: green;">✓ Test user registered!</p>';
+          } catch (registerError) {
+            // If registration fails (user exists), try login to verify database works
+            try {
+              const loginResponse = await api.login('test@example.com', 'testpass');
+              resultDiv.innerHTML = '<p style="color: green;">✓ Backend server is running!</p><p style="color: green;">✓ Database connection successful!</p><p style="color: orange;">ℹ Test user already exists (logged in successfully)</p>';
+            } catch (loginError) {
+              // Database might have issues
+              resultDiv.innerHTML = '<p style="color: green;">✓ Backend server is running!</p><p style="color: orange;">⚠ Database connection issue: ' + loginError.message + '</p><p>Check your database credentials in the secrets file.</p>';
+            }
+          }
+        } catch (error) {
+          // Backend is not running or unreachable
+          resultDiv.innerHTML = '<p style="color: red;">✗ Backend connection failed!</p><p style="color: red;">Error: ' + error.message + '</p><p><strong>Make sure:</strong></p><ul><li>Backend server is running on http://localhost:8080</li><li>Run: <code>mvn spring-boot:run</code> in the PeerSphere_api directory</li></ul>';
+        }
+      }
+    </script>
   </body>
 </html>
