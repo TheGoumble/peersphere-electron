@@ -4,49 +4,104 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self' http://localhost:*; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:*"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self'; connect-src 'self' https://peersphere-backend-691058527412.us-central1.run.app"
     />
-    <title>PeerSphere</title>
+    <title>PeerSphere - Student Study Platform</title>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <h1>PeerSphere</h1>
-    <div id="app">
-      <h2>Welcome to PeerSphere!</h2>
-      <p>Backend API should be running on http://localhost:8080</p>
-      <button onclick="testConnection()">Test API Connection</button>
-      <div id="result"></div>
-    </div>
-    <script src="api.js"></script>
-    <script>
-      const api = new PeerSphereAPI();
+    <div class="container">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <h1>PeerSphere</h1>
+        <p>Your collaborative study platform. Connect with classmates, share notes, create flashcards, and succeed together.</p>
+      </div>
       
-      async function testConnection() {
-        const resultDiv = document.getElementById('result');
-        resultDiv.innerHTML = '<p>Testing connection to backend...</p>';
+      <!-- Auth Content -->
+      <div class="content" id="authContent">
+        <div class="tabs">
+          <button class="tab active" data-tab="login" onclick="switchTab('login')">Login</button>
+          <button class="tab" data-tab="register" onclick="switchTab('register')">Register</button>
+        </div>
         
-        try {
-          // First, check if backend is running
-          const healthResponse = await api.healthCheck();
-          resultDiv.innerHTML = '<p style="color: green;">✓ Backend server is running!</p><p>Testing database connection...</p>';
-          
-          // Now try to register a test user (will fail if already exists, but that's okay)
-          try {
-            const response = await api.register('Test User', 'test@example.com', 'testpass');
-            resultDiv.innerHTML = '<p style="color: green;">✓ Backend server is running!</p><p style="color: green;">✓ Database connection successful!</p><p style="color: green;">✓ Test user registered!</p>';
-          } catch (registerError) {
-            // If registration fails (user exists), try login to verify database works
-            try {
-              const loginResponse = await api.login('test@example.com', 'testpass');
-              resultDiv.innerHTML = '<p style="color: green;">✓ Backend server is running!</p><p style="color: green;">✓ Database connection successful!</p><p style="color: orange;">ℹ Test user already exists (logged in successfully)</p>';
-            } catch (loginError) {
-              // Database might have issues
-              resultDiv.innerHTML = '<p style="color: green;">✓ Backend server is running!</p><p style="color: orange;">⚠ Database connection issue: ' + loginError.message + '</p><p>Check your database credentials in the secrets file.</p>';
-            }
-          }
-        } catch (error) {
-          // Backend is not running or unreachable
-          resultDiv.innerHTML = '<p style="color: red;">✗ Backend connection failed!</p><p style="color: red;">Error: ' + error.message + '</p><p><strong>Make sure:</strong></p><ul><li>Backend server is running on http://localhost:8080</li><li>Run: <code>mvn spring-boot:run</code> in the PeerSphere_api directory</li></ul>';
-        }
+        <div id="messageBox" class="message"></div>
+        
+        <!-- Login Form -->
+        <div id="loginForm" class="form-container active">
+          <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label for="loginEmail">Email</label>
+              <input type="email" id="loginEmail" required placeholder="you@example.com" />
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">Password</label>
+              <input type="password" id="loginPassword" required placeholder="Enter your password" />
+            </div>
+            <button type="submit" id="loginBtn" data-original-text="Login">Login</button>
+          </form>
+        </div>
+        
+        <!-- Register Form -->
+        <div id="registerForm" class="form-container">
+          <form onsubmit="handleRegister(event)">
+            <div class="form-group">
+              <label for="registerName">Full Name</label>
+              <input type="text" id="registerName" required placeholder="John Doe" />
+            </div>
+            <div class="form-group">
+              <label for="registerEmail">Email</label>
+              <input type="email" id="registerEmail" required placeholder="you@example.com" />
+            </div>
+            <div class="form-group">
+              <label for="registerPassword">Password</label>
+              <input type="password" id="registerPassword" required minlength="6" placeholder="At least 6 characters" />
+            </div>
+            <button type="submit" id="registerBtn" data-original-text="Create Account">Create Account</button>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Dashboard (hidden initially) -->
+      <div class="dashboard" id="dashboard">
+        <h2>Welcome to PeerSphere! 🎉</h2>
+        <div class="user-info">
+          <h3>User Information</h3>
+          <p><strong>Name:</strong> <span id="userName"></span></p>
+          <p><strong>Email:</strong> <span id="userEmail"></span></p>
+          <p><strong>User ID:</strong> <span id="userId"></span></p>
+        </div>
+        <button class="logout-btn" onclick="handleLogout()">Logout</button>
+      </div>
+    </div>
+    
+    <!-- Load JS modules -->
+    <script src="api.js"></script>
+    <script src="auth-manager.js"></script>
+    <script src="ui-manager.js"></script>
+    <script src="app.js"></script>
+    <script>
+      // Initialize the application
+      let app;
+      
+      document.addEventListener('DOMContentLoaded', () => {
+        app = new App();
+      });
+
+      // Expose functions for onclick handlers
+      function switchTab(tab) {
+        if (app) app.switchTab(tab);
+      }
+
+      function handleLogin(event) {
+        if (app) app.handleLogin(event);
+      }
+
+      function handleRegister(event) {
+        if (app) app.handleRegister(event);
+      }
+
+      function handleLogout() {
+        if (app) app.handleLogout();
       }
     </script>
   </body>

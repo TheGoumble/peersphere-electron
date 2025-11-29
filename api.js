@@ -1,8 +1,8 @@
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_URL = 'https://peersphere-backend-691058527412.us-central1.run.app';
 
 class PeerSphereAPI {
     constructor() {
-        this.baseURL = API_BASE_URL;
+        this.baseURL = API_URL;
     }
 
     async request(endpoint, options = {}) {
@@ -48,21 +48,21 @@ class PeerSphereAPI {
 
     // Health check endpoint
     async healthCheck() {
-        return this.request('/health', {
+        return this.request('/api/health', {
             method: 'GET',
         });
     }
 
     // Auth endpoints
     async register(name, email, password) {
-        return this.request('/auth/register', {
+        return this.request('/api/auth/register', {
             method: 'POST',
             body: { name, email, password },
         });
     }
 
     async login(email, password) {
-        return this.request('/auth/login', {
+        return this.request('/api/auth/login', {
             method: 'POST',
             body: { email, password },
         });
@@ -70,173 +70,173 @@ class PeerSphereAPI {
 
     // Group endpoints
     async createGroup(name, courseCode, creatorUserId) {
-        return this.request('/groups', {
+        return this.request('/api/groups', {
             method: 'POST',
             body: { name, courseCode, creatorUserId },
         });
     }
 
     async joinGroup(userId, groupCode) {
-        return this.request(`/groups/join?userId=${userId}`, {
+        return this.request(`/api/groups/join?userId=${userId}`, {
             method: 'POST',
             body: { groupCode },
         });
     }
 
     async getUserGroups(userId) {
-        return this.request(`/groups/user/${userId}`, {
+        return this.request(`/api/groups/user/${userId}`, {
             method: 'GET',
         });
     }
 
     async getGroup(groupId) {
-        return this.request(`/groups/${groupId}`, {
+        return this.request(`/api/groups/${groupId}`, {
             method: 'GET',
         });
     }
 
     // Deck endpoints
     async createDeck(groupId, title, description, createdBy) {
-        return this.request('/decks', {
+        return this.request('/api/decks', {
             method: 'POST',
             body: { groupId, title, description, createdBy },
         });
     }
 
     async getDecksByGroup(groupId) {
-        return this.request(`/decks/group/${groupId}`, {
+        return this.request(`/api/decks/group/${groupId}`, {
             method: 'GET',
         });
     }
 
     async getDeck(deckId) {
-        return this.request(`/decks/${deckId}`, {
+        return this.request(`/api/decks/${deckId}`, {
             method: 'GET',
         });
     }
 
     async updateDeck(deckId, title, description) {
-        return this.request(`/decks/${deckId}`, {
+        return this.request(`/api/decks/${deckId}`, {
             method: 'PUT',
             body: { title, description },
         });
     }
 
     async deleteDeck(deckId) {
-        return this.request(`/decks/${deckId}`, {
+        return this.request(`/api/decks/${deckId}`, {
             method: 'DELETE',
         });
     }
 
     // Flashcard endpoints
     async createFlashcard(deckId, question, answer, createdBy) {
-        return this.request('/flashcards', {
+        return this.request('/api/flashcards', {
             method: 'POST',
             body: { deckId, question, answer, createdBy },
         });
     }
 
     async getFlashcardsByDeck(deckId) {
-        return this.request(`/flashcards/deck/${deckId}`, {
+        return this.request(`/api/flashcards/deck/${deckId}`, {
             method: 'GET',
         });
     }
 
     async getFlashcard(cardId) {
-        return this.request(`/flashcards/${cardId}`, {
+        return this.request(`/api/flashcards/${cardId}`, {
             method: 'GET',
         });
     }
 
     async updateFlashcard(cardId, question, answer) {
-        return this.request(`/flashcards/${cardId}`, {
+        return this.request(`/api/flashcards/${cardId}`, {
             method: 'PUT',
             body: { question, answer },
         });
     }
 
     async deleteFlashcard(cardId) {
-        return this.request(`/flashcards/${cardId}`, {
+        return this.request(`/api/flashcards/${cardId}`, {
             method: 'DELETE',
         });
     }
 
     // Note endpoints
     async createNote(groupId, authorId, title, content) {
-        return this.request('/notes', {
+        return this.request('/api/notes', {
             method: 'POST',
             body: { groupId, authorId, title, content },
         });
     }
 
     async getNotesByGroup(groupId) {
-        return this.request(`/notes/group/${groupId}`, {
+        return this.request(`/api/notes/group/${groupId}`, {
             method: 'GET',
         });
     }
 
     async getNote(noteId) {
-        return this.request(`/notes/${noteId}`, {
+        return this.request(`/api/notes/${noteId}`, {
             method: 'GET',
         });
     }
 
     async updateNote(noteId, title, content) {
-        return this.request(`/notes/${noteId}`, {
+        return this.request(`/api/notes/${noteId}`, {
             method: 'PUT',
             body: { title, content },
         });
     }
 
     async deleteNote(noteId) {
-        return this.request(`/notes/${noteId}`, {
+        return this.request(`/api/notes/${noteId}`, {
             method: 'DELETE',
         });
     }
 
     // Message endpoints
     async sendMessage(groupId, authorId, content) {
-        return this.request('/messages', {
+        return this.request('/api/messages', {
             method: 'POST',
             body: { groupId, authorId, content },
         });
     }
 
     async getMessages(groupId, limit = 50) {
-        return this.request(`/messages/group/${groupId}?limit=${limit}`, {
+        return this.request(`/api/messages/group/${groupId}?limit=${limit}`, {
             method: 'GET',
         });
     }
 
     // Calendar endpoints
     async createEvent(groupId, title, description, startTime, endTime, createdBy) {
-        return this.request('/calendar', {
+        return this.request('/api/calendar', {
             method: 'POST',
             body: { groupId, title, description, startTime, endTime, createdBy },
         });
     }
 
     async getEventsByGroup(groupId) {
-        return this.request(`/calendar/group/${groupId}`, {
+        return this.request(`/api/calendar/group/${groupId}`, {
             method: 'GET',
         });
     }
 
     async getEvent(eventId) {
-        return this.request(`/calendar/${eventId}`, {
+        return this.request(`/api/calendar/${eventId}`, {
             method: 'GET',
         });
     }
 
     async updateEvent(eventId, title, description, startTime, endTime) {
-        return this.request(`/calendar/${eventId}`, {
+        return this.request(`/api/calendar/${eventId}`, {
             method: 'PUT',
             body: { title, description, startTime, endTime },
         });
     }
 
     async deleteEvent(eventId) {
-        return this.request(`/calendar/${eventId}`, {
+        return this.request(`/api/calendar/${eventId}`, {
             method: 'DELETE',
         });
     }
