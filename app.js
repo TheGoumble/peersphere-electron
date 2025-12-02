@@ -10,8 +10,9 @@ class App {
 
     init() {
         // Check if user is already logged in
-        if (this.auth.isAuthenticated()) {
-            this.showDashboard();
+        if (SessionManager.isAuthenticated()) {
+            window.location.href = 'pages/homePage.html';
+            return;
         }
 
         // Bind event listeners
@@ -44,9 +45,12 @@ class App {
         this.ui.hideMessage();
         
         try {
-            await this.auth.login(email, password);
-            this.ui.showMessage('Login successful! Welcome back!', 'success');
-            setTimeout(() => this.showDashboard(), 1000);
+            const user = await this.auth.login(email, password);
+            SessionManager.saveSession(user);
+            this.ui.showMessage('Login successful! Redirecting...', 'success');
+            setTimeout(() => {
+                window.location.href = 'pages/homePage.html';
+            }, 1000);
         } catch (error) {
             this.ui.showMessage('Login failed: ' + error.message, 'error');
             btn.disabled = false;
@@ -67,9 +71,12 @@ class App {
         this.ui.hideMessage();
         
         try {
-            await this.auth.register(name, email, password);
-            this.ui.showMessage('Account created successfully! Welcome!', 'success');
-            setTimeout(() => this.showDashboard(), 1000);
+            const user = await this.auth.register(name, email, password);
+            SessionManager.saveSession(user);
+            this.ui.showMessage('Account created successfully! Redirecting...', 'success');
+            setTimeout(() => {
+                window.location.href = 'pages/homePage.html';
+            }, 1000);
         } catch (error) {
             this.ui.showMessage('Registration failed: ' + error.message, 'error');
             btn.disabled = false;
