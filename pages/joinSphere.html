@@ -4,15 +4,35 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>MySpheres</title>
-    <link rel="stylesheet" href="../styles.css" />
-        <style>
+    <script src="../config.js"></script>
+    <link rel="stylesheet" href="../styles/space-theme.css">
+    <title>Join Sphere - PeerSphere</title>
+    <style>
       body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         min-height: 100vh;
         margin: 0;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+
+      .back-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 16px;
+        z-index: 1000;
+      }
+
+      .back-button:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateX(-5px);
       }
 
       .home-container {
@@ -140,12 +160,9 @@
 <body>
     <div class="stars" id="stars"></div>
     
-    <div class="container" style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <button onclick="location.href='homePage.html'" class="btn-secondary" style="padding: 10px 20px;">← Back</button>
-            <button onclick="location.href='mySettings.html'" class="btn-settings" style="background: rgba(108, 117, 125, 0.8); color: white; padding: 10px 20px; border-radius: 10px;">⚙️ Settings</button>
-        </div>
+    <button onclick="location.href='homePage.html'" class="back-button">← Back</button>
     
+    <div class="container" style="max-width: 600px; margin: 0 auto; padding: 20px;">
         <h1>Join a PeerSphere</h1>
 
         <div class="info-box">
