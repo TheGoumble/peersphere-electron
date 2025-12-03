@@ -4,23 +4,107 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>MySpheres</title>
-
+    <script src="../config.js"></script>
+    <title>Create a PeerSphere</title>
+    <link rel="stylesheet" href="../styles/space-theme.css">
+    <style>
+        .container {
+            max-width: 600px;
+        }
+        .result-card {
+            border: 2px solid rgba(102, 126, 234, 1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+    </style>
 </head>
 <body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <button onclick="location.href='homePage.html'" class="btn-secondary" style="padding: 10px 20px;">← Back</button>
+            <button onclick="location.href='mySettings.html'" class="btn-settings" style="background: rgba(108, 117, 125, 0.8); color: white; padding: 10px 20px; border-radius: 10px;">⚙️ Settings</button>
+        </div>
 
-    <header>
-        <h1>Create Spheres</h1>
-    </header>
+        <h1>🌐 Create a New PeerSphere</h1>
 
-    <main>
-        <p>Create Spheres page</p>
-    </main>
+        <div class="glass-container">
+            <form id="createSphereForm">
+                <div class="form-group">
+                    <label for="sphereName">Sphere Name *</label>
+                    <input type="text" id="sphereName" placeholder="e.g., Software Engineering Study Group" required />
+                </div>
 
-    <footer>
-        <p>&copy; 2025 MySpheres</p>
-    </footer>
+        <div class="form-group">
+            <label for="courseCode">Course Code:</label>
+            <input type="text" id="courseCode" placeholder="e.g., CEN 4010" required />
+        </div>
 
+        <button type="submit" class="btn-primary">Create Sphere</button>
+    </form>
+
+    <div id="message"></div>
+    <div id="result"></div>
+
+    <script src="../api.js"></script>
+    <script src="../session-manager.js"></script>
+    <script src="../scripts/space-init.js"></script>
+    <script>
+        const api = new PeerSphereAPI();
+        
+        // Check authentication
+        if (!SessionManager.requireAuth()) {
+            // Will redirect if not authenticated
+        }
+
+        document.getElementById('createSphereForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('sphereName').value.trim();
+            const courseCode = document.getElementById('courseCode').value.trim();
+            const userId = SessionManager.getUserId();
+
+            const messageDiv = document.getElementById('message');
+            const resultDiv = document.getElementById('result');
+            
+            // Clear previous messages
+            messageDiv.innerHTML = '';
+            resultDiv.innerHTML = '';
+
+            try {
+                // Call API to create group - matching backend parameters: name, courseCode, creatorUserId
+                const response = await api.createGroup(name, courseCode, userId);
+                
+                // Get the created group details to show the group code
+                const group = await api.getGroup(response.groupId);
+                
+                // Show success message
+                messageDiv.innerHTML = '<div class="message success">✓ PeerSphere created successfully!</div>';
+                
+                // Show group details
+                resultDiv.innerHTML = `
+                    <div class="result-card">
+                        <h3>${group.name}</h3>
+                        <p><strong>Course:</strong> ${group.courseCode}</p>
+                        <p><strong>Group Code:</strong> <span style="font-size: 1.2em; color: #667eea; font-weight: bold;">${group.groupCode}</span></p>
+                        <p style="color: #666;">Share this code with others so they can join your PeerSphere!</p>
+                        <button onclick="location.href='mySpheres.html'" class="btn-primary">View My Spheres</button>
+                        <button onclick="location.href='specificSphere.html?groupId=${group.groupId}'" class="btn-primary">Open Sphere</button>
+                    </div>
+                `;
+                
+                // Reset form
+                document.getElementById('createSphereForm').reset();
+                
+            } catch (error) {
+                console.error('Error creating sphere:', error);
+                messageDiv.innerHTML = `<div class="message error">Error: ${error.message}</div>`;
+            }
+        });
+    </script>
 </body>
 </html>

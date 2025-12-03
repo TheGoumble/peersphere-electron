@@ -4,31 +4,450 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="../config.js"></script>
+    <link rel="stylesheet" href="../styles/space-theme.css">
+    <title>Peer Study - PeerSphere</title>
+    <style>
+        /* Page-specific styles */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
 
-    <title>Peer Sphere</title>
+        .tabs {
+            display: flex;
+            gap: 20px;
+        }
 
+        .create-btn {
+            background: rgba(102, 126, 234, 0.8);
+            color: white;
+            border: 2px solid rgba(102, 126, 234, 1);
+            padding: 12px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .create-btn:hover {
+            background: rgba(102, 126, 234, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+    </style>
 </head>
 <body>
+    <div class="stars" id="stars"></div>
+    <button class="back-btn" onclick="goBack()" title="Back to Sphere">←</button>
+    
+    <div class="container">
+        <h1>📚 Peer Study - <span id="sphereName">Loading...</span></h1>
 
-    <header>
-        <h1>Peer Study</h1>
-    </header>
+        <div class="top-bar">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('notes')">📄 Notes</div>
+                <div class="tab" onclick="switchTab('decks')">🃏 Flashcard Decks</div>
+            </div>
+            <button class="create-btn" onclick="openCreateModal()">+ Create New</button>
+        </div>
 
-    <main>
-        <p>Peer Study display Page</p>
-    </main>
+        <!-- Notes Tab -->
+        <div id="notesTab" class="tab-content active">
+            <div id="notesLoading" class="loading">Loading notes...</div>
+            <div id="notesContainer" class="work-grid"></div>
+        </div>
 
-    <footer>
-        <p>&copy; 2025 MySpheres</p>
-    </footer>
+        <!-- Decks Tab -->
+        <div id="decksTab" class="tab-content">
+            <div id="decksLoading" class="loading">Loading flashcard decks...</div>
+            <div id="decksContainer" class="work-grid"></div>
+        </div>
+    </div>
 
+    <!-- Create Note Modal -->
+    <div id="createNoteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📝 Create New Note</h2>
+                <button class="close-btn" onclick="closeModal('createNoteModal')">&times;</button>
+            </div>
+            <form id="createNoteForm" onsubmit="handleCreateNote(event)">
+                <div class="form-group">
+                    <label for="noteTitle">Title *</label>
+                    <input type="text" id="noteTitle" required placeholder="Enter note title" maxlength="255">
+                </div>
+                <div class="form-group">
+                    <label for="noteContent">Content *</label>
+                    <textarea id="noteContent" required placeholder="Write your note here..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('createNoteModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Note</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create Deck Modal -->
+    <div id="createDeckModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🃏 Create New Flashcard Deck</h2>
+                <button class="close-btn" onclick="closeModal('createDeckModal')">&times;</button>
+            </div>
+            <form id="createDeckForm" onsubmit="handleCreateDeck(event)">
+                <div class="form-group">
+                    <label for="deckTitle">Deck Title *</label>
+                    <input type="text" id="deckTitle" required placeholder="Enter deck title" maxlength="255">
+                </div>
+                <div class="form-group">
+                    <label for="deckDescription">Description</label>
+                    <textarea id="deckDescription" placeholder="Describe what this deck is about..." rows="4"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('createDeckModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Deck</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Note Modal -->
+    <div id="editNoteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Edit Note</h2>
+                <button class="close-btn" onclick="closeModal('editNoteModal')">&times;</button>
+            </div>
+            <form id="editNoteForm" onsubmit="handleEditNote(event)">
+                <input type="hidden" id="editNoteId">
+                <div class="form-group">
+                    <label for="editNoteTitle">Title *</label>
+                    <input type="text" id="editNoteTitle" required placeholder="Enter note title" maxlength="255">
+                </div>
+                <div class="form-group">
+                    <label for="editNoteContent">Content *</label>
+                    <textarea id="editNoteContent" required placeholder="Write your note here..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('editNoteModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Update Note</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Deck Modal -->
+    <div id="editDeckModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Edit Deck</h2>
+                <button class="close-btn" onclick="closeModal('editDeckModal')">&times;</button>
+            </div>
+            <form id="editDeckForm" onsubmit="handleEditDeck(event)">
+                <input type="hidden" id="editDeckId">
+                <div class="form-group">
+                    <label for="editDeckTitle">Deck Title *</label>
+                    <input type="text" id="editDeckTitle" required placeholder="Enter deck title" maxlength="255">
+                </div>
+                <div class="form-group">
+                    <label for="editDeckDescription">Description</label>
+                    <textarea id="editDeckDescription" placeholder="Describe what this deck is about..." rows="4"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('editDeckModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Update Deck</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../scripts/space-init.js"></script>
+    <script src="../api.js"></script>
+    <script src="../session-manager.js"></script>
+    <script src="../utils/edit-delete-utils.js"></script>
+    <script src="../components/form-handler.js"></script>
+    <script>
+        const api = new PeerSphereAPI();
+        const utils = new EditDeleteUtils(api);
+
+        // Check authentication
+        if (!SessionManager.requireAuth()) {
+            // Will redirect if not authenticated
+        }
+
+        const userId = SessionManager.getUserId();
+        const user = { userId: userId }; // Create user object for comparison
+        const urlParams = new URLSearchParams(window.location.search);
+        const groupId = parseInt(urlParams.get('groupId'));
+
+        if (!groupId) {
+            alert('No sphere selected');
+            location.href = 'mySpheres.html';
+        }
+
+        let currentTab = 'notes';
+        let groupInfo = null;
+
+        function goBack() {
+            location.href = `specificSphere.html?groupId=${groupId}`;
+        }
+
+        // Load group info
+        async function loadGroupInfo() {
+            try {
+                const groups = await api.getUserGroups(userId);
+                groupInfo = groups.find(g => g.groupId === groupId);
+                if (groupInfo) {
+                    document.getElementById('sphereName').textContent = groupInfo.name;
+                }
+            } catch (error) {
+                console.error('Error loading group info:', error);
+            }
+        }
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            if (tabName === 'notes') {
+                document.getElementById('notesTab').classList.add('active');
+            } else {
+                document.getElementById('decksTab').classList.add('active');
+            }
+        }
+
+        function openCreateModal() {
+            if (currentTab === 'notes') {
+                document.getElementById('createNoteModal').classList.add('active');
+            } else {
+                document.getElementById('createDeckModal').classList.add('active');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            // Reset form
+            if (modalId === 'createNoteModal') {
+                document.getElementById('createNoteForm').reset();
+            } else if (modalId === 'createDeckModal') {
+                document.getElementById('createDeckForm').reset();
+            }
+        }
+
+        async function handleCreateNote(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+            
+            if (!title || !content) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            await FormHandler.handleCreate(
+                event,
+                () => api.createNote(groupId, userId, title, content),
+                loadNotes,
+                'Note',
+                [],
+                () => closeModal('createNoteModal')
+            );
+        }
+
+        async function handleCreateDeck(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('deckTitle').value.trim();
+            const description = document.getElementById('deckDescription').value.trim();
+            
+            if (!title) {
+                alert('Please enter a deck title');
+                return;
+            }
+
+            await FormHandler.handleCreate(
+                event,
+                () => api.createDeck(groupId, title, description, userId),
+                loadDecks,
+                'Deck',
+                [],
+                () => closeModal('createDeckModal')
+            );
+        }
+
+        async function loadNotes() {
+            const loadingDiv = document.getElementById('notesLoading');
+            const container = document.getElementById('notesContainer');
+
+            try {
+                const notes = await api.getGroupNotes(groupId);
+                utils.renderItems(notes, 'note', container, loadingDiv, userId, 'viewNote', 
+                    'Create the first note for this sphere!');
+                
+                // Setup event delegation for notes
+                utils.setupEventDelegation(container, {
+                    onView: viewNote,
+                    onEdit: editNote,
+                    onDelete: deleteNote
+                });
+            } catch (error) {
+                console.error('Error loading notes:', error);
+                utils.showError(container, loadingDiv, `Could not load notes. ${error.message}`, 'loadNotes');
+            }
+        }
+
+        async function loadDecks() {
+            const loadingDiv = document.getElementById('decksLoading');
+            const container = document.getElementById('decksContainer');
+
+            try {
+                const decks = await api.getGroupDecks(groupId);
+                utils.renderItems(decks, 'deck', container, loadingDiv, userId, 'viewDeck',
+                    'Create the first flashcard deck for this sphere!');
+                
+                // Setup event delegation for decks
+                utils.setupEventDelegation(container, {
+                    onView: viewDeck,
+                    onEdit: editDeck,
+                    onDelete: deleteDeck
+                });
+            } catch (error) {
+                console.error('Error loading decks:', error);
+                utils.showError(container, loadingDiv, `Could not load flashcard decks. ${error.message}`, 'loadDecks');
+            }
+        }
+
+        function viewNote(noteId) {
+            location.href = `viewNote.html?noteId=${noteId}&groupId=${groupId}`;
+        }
+
+        function viewDeck(deckId) {
+            location.href = `group-flashcards.html?deckId=${deckId}&groupId=${groupId}`;
+        }
+
+        function editNote(noteId, title, content) {
+            utils.openEditNoteModal(noteId, title, content);
+        }
+
+        async function handleEditNote(event) {
+            await utils.handleEditNote(event, loadNotes);
+        }
+
+        async function deleteNote(noteId) {
+            await utils.deleteNote(noteId, loadNotes);
+        }
+
+        function editDeck(deckId, name, description) {
+            utils.openEditDeckModal(deckId, name, description);
+        }
+
+        async function handleEditDeck(event) {
+            await utils.handleEditDeck(event, loadDecks);
+        }
+
+        async function deleteDeck(deckId) {
+            await utils.deleteDeck(deckId, loadDecks);
+        }
+
+        function openCreateModal() {
+            // Close any open modals first
+            document.querySelectorAll('.modal.active').forEach(modal => {
+                modal.classList.remove('active');
+                const form = modal.querySelector('form');
+                if (form) {
+                    form.reset();
+                    // Re-enable any disabled buttons
+                    const buttons = form.querySelectorAll('button');
+                    buttons.forEach(btn => {
+                        btn.disabled = false;
+                        if (btn.textContent.includes('Creating') || btn.textContent.includes('Updating')) {
+                            btn.textContent = btn.textContent.includes('Note') ? 
+                                (btn.closest('#editNoteModal') ? 'Update Note' : 'Create Note') :
+                                (btn.closest('#editDeckModal') ? 'Update Deck' : 'Create Deck');
+                        }
+                    });
+                }
+            });
+            
+            // Small delay to ensure cleanup completes
+            setTimeout(() => {
+                let modalId;
+                if (currentTab === 'notes') {
+                    modalId = 'createNoteModal';
+                } else {
+                    modalId = 'createDeckModal';
+                }
+                
+                const modal = document.getElementById(modalId);
+                modal.classList.add('active');
+                
+                // Focus first input after modal is visible
+                setTimeout(() => {
+                    const firstInput = modal.querySelector('input, select, textarea');
+                    if (firstInput) {
+                        firstInput.focus();
+                    }
+                }, 100);
+            }, 50);
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            
+            modal.classList.remove('active');
+            
+            // Reset form and button states
+            const form = modal.querySelector('form');
+            if (form) {
+                form.reset();
+                
+                // Reset submit button
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    // Reset text based on modal type
+                    if (modalId.includes('Note')) {
+                        submitBtn.textContent = modalId.includes('edit') ? 'Update Note' : 'Create Note';
+                    } else if (modalId.includes('Deck')) {
+                        submitBtn.textContent = modalId.includes('edit') ? 'Update Deck' : 'Create Deck';
+                    }
+                }
+            }
+        }
+
+        // Setup modal handlers
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal') && e.target.classList.contains('active')) {
+                closeModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const activeModal = document.querySelector('.modal.active');
+                if (activeModal) {
+                    closeModal(activeModal.id);
+                }
+            }
+        });
+
+        // Load initial data
+        loadGroupInfo();
+        loadNotes();
+        loadDecks();
+    </script>
 </body>
-<button onclick="goToSphere()">Open Sphere Page</button>
-
-<script>
-function goToSphere() {
-    window.location.href = "specificSphere.html";
-}
-</script>
-
 </html>

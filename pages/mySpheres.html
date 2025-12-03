@@ -4,31 +4,426 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="../config.js"></script>
+    <title>My PeerSpheres</title>
+    <link rel="stylesheet" href="../styles/space-theme.css">
+    <style>
+        .home-container {
+            position: relative;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
 
-    <title>MySpheres</title>
+        .settings-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            z-index: 1000;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
+        .settings-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            z-index: 1000;
+            color: white;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .logo-title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 0 4px 20px rgba(102, 126, 234, 0.8);
+            text-align: center;
+            z-index: 10;
+        }
+
+        .main-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Earth/Sphere with orbital spheres */
+        .sphere {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+                linear-gradient(135deg, #4a90e2 0%, #2ecc71 30%, #3498db 70%, #1a5490 100%);
+            box-shadow: 
+                0 0 100px rgba(52, 152, 219, 0.6),
+                inset -30px -30px 80px rgba(0, 0, 0, 0.3),
+                inset 20px 20px 40px rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            animation: rotate 60s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        /* Land masses with people emojis */
+        .land-mass {
+            position: absolute;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            background: rgba(46, 204, 113, 0.8);
+            border-radius: 40% 60% 50% 40%;
+            box-shadow: 
+                inset 0 0 20px rgba(0, 0, 0, 0.2),
+                0 4px 10px rgba(46, 204, 113, 0.3);
+        }
+
+        .land-mass.continent1 {
+            top: 12%;
+            left: 8%;
+            width: 150px;
+            height: 110px;
+            transform: rotate(-15deg);
+            border-radius: 45% 55% 50% 45%;
+        }
+
+        .land-mass.continent2 {
+            top: 35%;
+            right: 12%;
+            width: 130px;
+            height: 100px;
+            border-radius: 50% 40% 60% 50%;
+            transform: rotate(20deg);
+        }
+
+        .land-mass.continent3 {
+            bottom: 18%;
+            left: 15%;
+            width: 135px;
+            height: 95px;
+            border-radius: 60% 40% 50% 60%;
+            transform: rotate(-25deg);
+        }
+
+        .land-mass.continent4 {
+            bottom: 25%;
+            right: 20%;
+            width: 120px;
+            height: 90px;
+            border-radius: 55% 45% 60% 40%;
+            transform: rotate(-12deg);
+        }
+
+        .person-emoji {
+            font-size: 1.2rem;
+            animation: wave 2s ease-in-out infinite;
+            animation-delay: calc(var(--i) * 0.2s);
+            display: inline-block;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-3px) scale(1.1); }
+        }
+
+        /* Orbital user spheres around the planet */
+        .user-sphere {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 
+                0 0 30px rgba(102, 126, 234, 0.6),
+                inset -8px -8px 20px rgba(0, 0, 0, 0.3),
+                inset 4px 4px 10px rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: orbit-float 4s ease-in-out infinite;
+            z-index: 5;
+        }
+
+        .user-sphere:hover {
+            transform: scale(1.3) !important;
+            box-shadow: 0 0 50px rgba(102, 126, 234, 0.9);
+            z-index: 100;
+        }
+
+        @keyframes orbit-float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .user-sphere-info {
+            text-align: center;
+            color: white;
+            padding: 5px;
+            width: 100%;
+            font-size: 0.65rem;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            word-wrap: break-word;
+        }
+
+        /* Navigation Buttons in center */
+        .nav-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 400px;
+            z-index: 10;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            min-height: 120px;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(102, 126, 234, 0.8);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-btn-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+        }
+
+        .nav-btn-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: white;
+            padding: 20px;
+        }
+    </style>
 </head>
+
 <body>
+    <!-- Starry background -->
+    <div class="stars" id="stars"></div>
 
-    <header>
-        <h1>MySpheres</h1>
-    </header>
+    <button class="back-btn" onclick="location.href='homePage.html'">← Back</button>
+    <button class="settings-btn" onclick="location.href='mySettings.html'" title="Settings">⚙️</button>
 
-    <main>
-        <p>My Spheres display Page</p>
-    </main>
+    <div class="home-container">
+        <div class="logo-title">
+            🌍 My Spheres
+        </div>
+        
+        <div id="loadingMessage" class="loading">Loading your spheres...</div>
+        
+        <div class="main-content">
+            <!-- Earth/Sphere with user's groups orbiting around it -->
+            <div class="sphere" id="sphereContainer">
+                <!-- Land masses with people (4 continents) -->
+                <div class="land-mass continent1">
+                    <span class="person-emoji" style="--i: 0">👨‍💼</span>
+                    <span class="person-emoji" style="--i: 1">👩‍🎓</span>
+                    <span class="person-emoji" style="--i: 2">👨‍🎓</span>
+                    <span class="person-emoji" style="--i: 3">👩</span>
+                    <span class="person-emoji" style="--i: 4">👨</span>
+                </div>
+                <div class="land-mass continent2">
+                    <span class="person-emoji" style="--i: 1">👨‍💻</span>
+                    <span class="person-emoji" style="--i: 2">👩‍💻</span>
+                    <span class="person-emoji" style="--i: 3">👨‍🏫</span>
+                    <span class="person-emoji" style="--i: 4">👩‍🏫</span>
+                </div>
+                <div class="land-mass continent3">
+                    <span class="person-emoji" style="--i: 0">👩‍🔬</span>
+                    <span class="person-emoji" style="--i: 1">👨‍🔬</span>
+                    <span class="person-emoji" style="--i: 2">👩‍⚕️</span>
+                    <span class="person-emoji" style="--i: 3">👨‍⚕️</span>
+                    <span class="person-emoji" style="--i: 4">👨‍🎨</span>
+                </div>
+                <div class="land-mass continent4">
+                    <span class="person-emoji" style="--i: 0">👩‍🎤</span>
+                    <span class="person-emoji" style="--i: 1">👨‍🚀</span>
+                    <span class="person-emoji" style="--i: 2">👩‍🚀</span>
+                    <span class="person-emoji" style="--i: 3">👨‍🔧</span>
+                </div>
 
-    <footer>
-        <p>&copy; 2025 MySpheres</p>
-    </footer>
+                <!-- Navigation Buttons in center -->
+                <div class="nav-buttons">
+                    <a href="createSphere.html" class="nav-btn">
+                        <div class="nav-btn-icon">➕</div>
+                        <div class="nav-btn-title">Create Sphere</div>
+                    </a>
 
+                    <a href="joinSphere.html" class="nav-btn">
+                        <div class="nav-btn-icon">🔗</div>
+                        <div class="nav-btn-title">Join Sphere</div>
+                    </a>
+                </div>
+
+                <!-- User's group spheres will be dynamically added here orbiting around -->
+            </div>
+        </div>
+    </div>
+
+    <script src="../api.js"></script>
+    <script src="../session-manager.js"></script>
+    <script src="../components/space-theme.js"></script>
+    <script src="../components/auth-utils.js"></script>
+    <script>
+        const api = new PeerSphereAPI();
+        
+        // Initialize theme and auth
+        SpaceTheme.initialize();
+        const user = AuthUtils.initializeAuth();
+
+        // Generate stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 200; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = Math.random() * 3 + 'px';
+            star.style.height = star.style.width;
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // Function to open sphere
+        function openSphere(groupId) {
+            window.location.href = `specificSphere.html?groupId=${groupId}`;
+        }
+
+        // Load user's groups and create orbital spheres
+        async function loadGroups() {
+            try {
+                const groups = await api.getUserGroups(user.userId);
+                document.getElementById('loadingMessage').style.display = 'none';
+                
+                if (groups.length === 0) {
+                    return; // Just show the create/join buttons
+                }
+
+                const sphereContainer = document.getElementById('sphereContainer');
+                const radius = 280; // Distance from center of planet
+                const sphereColors = [
+                    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                    'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                    'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                    'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                    'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+                    'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+                    'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)'
+                ];
+
+                // Create orbital spheres
+                groups.forEach((group, index) => {
+                    const angle = (360 / groups.length) * index;
+                    const x = Math.cos(angle * Math.PI / 180) * radius;
+                    const y = Math.sin(angle * Math.PI / 180) * radius;
+                    const color = sphereColors[index % sphereColors.length];
+                    
+                    const sphere = document.createElement('div');
+                    sphere.className = 'user-sphere';
+                    sphere.style.background = color;
+                    sphere.style.left = `calc(50% + ${x}px)`;
+                    sphere.style.top = `calc(50% + ${y}px)`;
+                    sphere.style.animationDelay = `${index * 0.3}s`;
+                    
+                    sphere.innerHTML = `
+                        <div class="user-sphere-info">
+                            ${group.name || group.groupName || 'Sphere'}
+                        </div>
+                    `;
+                    
+                    sphere.onclick = () => openSphere(group.groupId);
+                    sphereContainer.appendChild(sphere);
+                });
+
+            } catch (error) {
+                console.error('Failed to load groups:', error);
+                document.getElementById('loadingMessage').textContent = 'Failed to load spheres. Please try again.';
+            }
+        }
+
+        loadGroups();
+    </script>
 </body>
-<button onclick="goToSphere()">Open Sphere Page</button>
-
-<script>
-function goToSphere() {
-    window.location.href = "specificSphere.html";
-}
-</script>
-
 </html>

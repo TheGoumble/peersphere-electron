@@ -4,31 +4,65 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>Peer Sphere</title>
-
+    <script src="../config.js"></script>
+    <link rel="stylesheet" href="../styles/space-theme.css">
+    <title>Peer Calendar - PeerSphere</title>
 </head>
 <body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <button onclick="goBack()" class="btn-secondary" style="padding: 10px 20px;">← Back to Sphere</button>
+            <button onclick="location.href='mySettings.html'" class="btn-settings" style="background: rgba(108, 117, 125, 0.8); color: white; padding: 10px 20px; border-radius: 10px;">⚙️ Settings</button>
+        </div>
 
-    <header>
-        <h1>Peer Calendar</h1>
-    </header>
+        <h1>📅 Peer Calendar - <span id="sphereName">Loading...</span></h1>
+        
+        <div class="empty-state">
+            <p>Calendar functionality coming soon!</p>
+            <p>Schedule and track study sessions with your sphere.</p>
+        </div>
+    </div>
 
-    <main>
-        <p>Peer Calendar display Page</p>
-    </main>
+    <script src="../scripts/space-init.js"></script>
+    <script src="../api.js"></script>
+    <script src="../session-manager.js"></script>
+    <script>
+        const api = new PeerSphereAPI();
+        
+        // Check authentication
+        if (!SessionManager.requireAuth()) {
+            // Will redirect if not authenticated
+        }
 
-    <footer>
-        <p>&copy; 2025 MySpheres</p>
-    </footer>
+        const userId = SessionManager.getUserId();
+        const urlParams = new URLSearchParams(window.location.search);
+        const groupId = parseInt(urlParams.get('groupId'));
 
-</body>
-<button onclick="goToSphere()">Open Sphere Page</button>
+        if (!groupId) {
+            alert('No sphere selected');
+            location.href = 'mySpheres.html';
+        }
 
-<script>
-function goToSphere() {
-    window.location.href = "specificSphere.html";
-}
-</script>
+        function goBack() {
+            location.href = `specificSphere.html?groupId=${groupId}`;
+        }
+
+        // Load group info
+        async function loadGroupInfo() {
+            try {
+                const groups = await api.getUserGroups(userId);
+                const groupInfo = groups.find(g => g.groupId === groupId);
+                if (groupInfo) {
+                    document.getElementById('sphereName').textContent = groupInfo.name;
+                }
+            } catch (error) {
+                console.error('Error loading group info:', error);
+            }
+        }
+
+        loadGroupInfo();
+    </script>
 
 </html>

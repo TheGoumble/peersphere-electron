@@ -4,23 +4,141 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>MySpheres</title>
-
+    <script src="../config.js"></script>
+    <title>Join a PeerSphere</title>
+    <link rel="stylesheet" href="../styles/space-theme.css">
+    <style>
+        .container {
+            max-width: 600px;
+        }
+        input {
+            text-transform: uppercase;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info-box {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .result-card {
+            border: 2px solid #28a745;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            background: #f8fff9;
+        }
+    </style>
 </head>
 <body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container" style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <button onclick="location.href='homePage.html'" class="btn-secondary" style="padding: 10px 20px;">← Back</button>
+            <button onclick="location.href='mySettings.html'" class="btn-settings" style="background: rgba(108, 117, 125, 0.8); color: white; padding: 10px 20px; border-radius: 10px;">⚙️ Settings</button>
+        </div>
+    
+        <h1>Join a PeerSphere</h1>
 
-    <header>
-        <h1>Join Spheres</h1>
-    </header>
+        <div class="info-box">
+            <p><strong>How to join:</strong></p>
+            <p>Enter the group code that was shared with you by the sphere creator. Group codes are typically 5-7 characters.</p>
+        </div>
 
-    <main>
-        <p>Join Spheres page</p>
-    </main>
+        <form id="joinSphereForm">
+        <div class="form-group">
+            <label for="groupCode">Group Code:</label>
+            <input 
+                type="text" 
+                id="groupCode" 
+                placeholder="e.g., ABC123" 
+                required 
+                maxlength="10"
+                style="text-transform: uppercase;"
+            />
+        </div>
 
-    <footer>
-        <p>&copy; 2025 MySpheres</p>
-    </footer>
+        <button type="submit" class="btn-primary">Join Sphere</button>
+    </form>
 
+    <div id="message"></div>
+    <div id="result"></div>
+
+    <script src="../scripts/space-init.js"></script>
+    <script src="../api.js"></script>
+    <script src="../session-manager.js"></script>
+    <script>
+        const api = new PeerSphereAPI();
+        
+        // Check authentication
+        if (!SessionManager.requireAuth()) {
+            // Will redirect if not authenticated
+        }
+
+        // Auto-uppercase input
+        document.getElementById('groupCode').addEventListener('input', (e) => {
+            e.target.value = e.target.value.toUpperCase();
+        });
+
+        document.getElementById('joinSphereForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const groupCode = document.getElementById('groupCode').value.trim().toUpperCase();
+            const userId = SessionManager.getUserId();
+
+            const messageDiv = document.getElementById('message');
+            const resultDiv = document.getElementById('result');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            
+            // Clear previous messages
+            messageDiv.innerHTML = '';
+            resultDiv.innerHTML = '';
+
+            // Disable button during request
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Joining...';
+
+            try {
+                // Call API to join group - matching backend parameters: userId, groupCode
+                await api.joinGroup(userId, groupCode);
+                
+                // Show success message
+                messageDiv.innerHTML = '<div class="message success">✓ Successfully joined the PeerSphere!</div>';
+                
+                // Show result with action buttons
+                resultDiv.innerHTML = `
+                    <div class="result-card">
+                        <h3>Welcome to the sphere! 🎉</h3>
+                        <p>You can now access this sphere from your "My Spheres" page.</p>
+                        <button onclick="location.href='mySpheres.html'" class="btn-primary">View My Spheres</button>
+                        <button onclick="location.href='homePage.html'" class="btn-secondary">Go to Home</button>
+                    </div>
+                `;
+                
+                // Reset form
+                document.getElementById('joinSphereForm').reset();
+                
+            } catch (error) {
+                console.error('Error joining sphere:', error);
+                messageDiv.innerHTML = `<div class="message error">Error: ${error.message}<br><br>Please check that the group code is correct and try again.</div>`;
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Join Sphere';
+            }
+        });
+    </script>
+    </div>
 </body>
 </html>

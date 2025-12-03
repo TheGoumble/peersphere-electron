@@ -4,23 +4,202 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="../config.js"></script>
+    <title>My Settings - PeerSphere</title>
+    <link rel="stylesheet" href="../styles/space-theme.css">
+    <style>
+        .container {
+            max-width: 800px;
+        }
 
-    <title>MySpheres</title>
+        .settings-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
 
+        .settings-section h2 {
+            margin-bottom: 20px;
+            color: rgba(102, 126, 234, 1);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .info-value {
+            color: white;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-danger {
+            background: rgba(231, 76, 60, 0.8);
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            margin-top: 20px;
+        }
+
+        .btn-danger:hover {
+            background: rgba(231, 76, 60, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6);
+        }
+
+        .sphere-badge {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.3);
+            color: rgba(102, 126, 234, 1);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-left: 10px;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        ul li {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        ul li:last-child {
+            border-bottom: none;
+        }
+    </style>
 </head>
 <body>
+    <div class="stars" id="stars"></div>
+    <button class="back-btn" onclick="location.href='homePage.html'" title="Back to Home">←</button>
+    
+    <div class="container">
+        <h1>⚙️ Personal Settings</h1>
 
-    <header>
-        <h1>Settings</h1>
-    </header>
+    <div class="settings-section">
+        <h2>Account Information</h2>
+        <div class="info-row">
+            <span class="info-label">Name:</span>
+            <span class="info-value" id="userName">Loading...</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Email:</span>
+            <span class="info-value" id="userEmail">Loading...</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">User ID:</span>
+            <span class="info-value" id="userId">Loading...</span>
+        </div>
+    </div>
 
-    <main>
-        <p>Peer Sphere user account settings</p>
-    </main>
+        <div class="settings-section">
+            <h2>My Spheres</h2>
+            <div id="spheresList">Loading your spheres...</div>
+        </div>
 
-    <footer>
-        <p>&copy; 2025 MySpheres</p>
-    </footer>
+        <div class="settings-section">
+            <h2>Account Actions</h2>
+            <button onclick="handleLogout()" class="btn-danger">Logout</button>
+        </div>
 
+        <div id="message"></div>
+    </div>
+
+    <script src="../scripts/space-init.js"></script>
+    <script src="../api.js"></script>
+    <script src="../session-manager.js"></script>
+    <script>
+        const api = new PeerSphereAPI();
+        
+        // Check authentication
+        if (!SessionManager.requireAuth()) {
+            // Will redirect if not authenticated
+        }
+
+        // Load user information
+        function loadUserInfo() {
+            const userName = SessionManager.getUserName();
+            const userEmail = SessionManager.getUserEmail();
+            const userId = SessionManager.getUserId();
+
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('userEmail').textContent = userEmail;
+            document.getElementById('userId').textContent = userId;
+        }
+
+        // Load user's spheres
+        async function loadSpheres() {
+            const userId = SessionManager.getUserId();
+            const container = document.getElementById('spheresList');
+
+            try {
+                const groups = await api.getUserGroups(userId);
+                
+                if (groups.length === 0) {
+                    container.innerHTML = '<p style="color: #666;">You are not in any spheres yet.</p>';
+                    return;
+                }
+
+                container.innerHTML = `<p><strong>You are a member of ${groups.length} sphere(s)</strong></p>`;
+                
+                const list = document.createElement('ul');
+                list.style.paddingLeft = '20px';
+                
+                groups.forEach(group => {
+                    const item = document.createElement('li');
+                    item.style.margin = '10px 0';
+                    item.innerHTML = `
+                        <strong>${group.name}</strong> (${group.courseCode})
+                        ${group.createdBy === userId ? '<span style="color: #667eea; font-size: 0.9em;"> - Creator</span>' : ''}
+                    `;
+                    list.appendChild(item);
+                });
+                
+                container.appendChild(list);
+
+            } catch (error) {
+                console.error('Error loading spheres:', error);
+                container.innerHTML = '<p style="color: #dc3545;">Error loading spheres</p>';
+            }
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                SessionManager.clearSession();
+                window.location.href = '../index.html';
+            }
+        }
+
+        // Initialize
+        loadUserInfo();
+        loadSpheres();
+    </script>
 </body>
 </html>

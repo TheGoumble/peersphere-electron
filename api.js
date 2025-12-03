@@ -1,4 +1,9 @@
-const API_URL = 'https://peersphere-backend-691058527412.us-central1.run.app';
+// Import configuration - config.js must be loaded before this file
+if (typeof CONFIG === 'undefined') {
+    throw new Error('CONFIG is not defined. Make sure config.js is loaded before api.js');
+}
+
+const API_URL = CONFIG.API_BASE_URL;
 
 class PeerSphereAPI {
     constructor() {
@@ -92,6 +97,19 @@ class PeerSphereAPI {
     async getGroup(groupId) {
         return this.request(`/api/groups/${groupId}`, {
             method: 'GET',
+        });
+    }
+
+    async updateGroup(groupId, name, courseCode) {
+        return this.request(`/api/groups/${groupId}`, {
+            method: 'PUT',
+            body: { name, courseCode },
+        });
+    }
+
+    async deleteGroup(groupId) {
+        return this.request(`/api/groups/${groupId}`, {
+            method: 'DELETE',
         });
     }
 
@@ -192,6 +210,30 @@ class PeerSphereAPI {
         return this.request(`/api/notes/${noteId}`, {
             method: 'DELETE',
         });
+    }
+
+    // Get all notes for a user (across all groups)
+    async getUserNotes(userId) {
+        return this.request(`/api/notes/user/${userId}`, {
+            method: 'GET',
+        });
+    }
+
+    // Aliases for group-specific methods
+    async getGroupNotes(groupId) {
+        return this.getNotesByGroup(groupId);
+    }
+
+    // Get all decks for a user (across all groups)
+    async getUserDecks(userId) {
+        return this.request(`/api/decks/user/${userId}`, {
+            method: 'GET',
+        });
+    }
+
+    // Aliases for group-specific methods
+    async getGroupDecks(groupId) {
+        return this.getDecksByGroup(groupId);
     }
 
     // Message endpoints
