@@ -1,19 +1,69 @@
 {
   "name": "peer-sphere",
   "version": "1.0.0",
-  "description": "Peer Sphere ",
+  "description": "Peer Sphere - Collaborative Study Platform",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "build:all": "electron-builder -mwl",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "PeerSphere Team",
   "license": "MIT",
   "devDependencies": {
-    "electron": "23.1.3"
+    "electron": "23.1.3",
+    "electron-builder": "^23.6.0"
   },
   "dependencies": {
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
+  },
+  "build": {
+    "appId": "com.peersphere.app",
+    "productName": "PeerSphere",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "**/*",
+      "!**/*.md",
+      "!dist",
+      "!node_modules",
+      "node_modules/electron/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "build/icon.icns",
+      "category": "public.app-category.education"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "build/icon.png",
+      "category": "Education"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   }
 }

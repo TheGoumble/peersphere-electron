@@ -16,7 +16,6 @@
             margin-bottom: 40px;
         }
 
-<<<<<<< HEAD
         .tabs {
             display: flex;
             gap: 20px;
@@ -40,138 +39,6 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
         }
-=======
-    <title>Peer Sphere</title>
-    <link rel="stylesheet" href="../styles.css" />
-        <style>
-      body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      }
-
-      .home-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 40px 20px;
-      }
-
-      .header {
-        background: white;
-        border-radius: 15px;
-        padding: 30px;
-        margin-bottom: 30px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      }
-
-      .header h1 {
-        margin: 0 0 10px 0;
-        color: #333;
-      }
-
-      .header p {
-        color: #666;
-        margin: 0;
-      }
-
-      .header .user-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 1px solid #eee;
-      }
-
-      .stats-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-      }
-
-      .stat-card {
-        background: white;
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        text-align: center;
-      }
-
-      .stat-number {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #667eea;
-        margin: 10px 0;
-      }
-
-      .stat-label {
-        color: #666;
-        font-size: 0.9rem;
-      }
-
-      .navigation-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 20px;
-      }
-
-      .nav-card {
-        background: white;
-        border-radius: 15px;
-        padding: 30px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-        text-decoration: none;
-        color: inherit;
-        display: block;
-      }
-
-      .nav-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      }
-
-      .nav-card-icon {
-        font-size: 3rem;
-        margin-bottom: 15px;
-      }
-
-      .nav-card h3 {
-        margin: 0 0 10px 0;
-        color: #333;
-      }
-
-      .nav-card p {
-        color: #666;
-        margin: 0;
-        font-size: 0.9rem;
-      }
-
-      .logout-btn {
-        background: #dc3545;
-        color: white;
-        border: none;
-        padding: 10px 25px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: background 0.3s;
-      }
-
-      .logout-btn:hover {
-        background: #c82333;
-      }
-
-      .loading {
-        text-align: center;
-        padding: 40px;
-        color: white;
-        font-size: 1.2rem;
-      }
->>>>>>> a8984a8d0e769bc607092b231ccaa7a7666ca82f
     </style>
 </head>
 <body>
@@ -301,34 +168,32 @@
     </div>
 
     <script src="../scripts/space-init.js"></script>
+    <script src="../components/page-utils.js"></script>
+    <script src="../components/modal-manager.js"></script>
+    <script src="../components/tab-manager.js"></script>
     <script src="../api.js"></script>
     <script src="../session-manager.js"></script>
     <script src="../utils/edit-delete-utils.js"></script>
     <script src="../components/form-handler.js"></script>
     <script>
-        const api = new PeerSphereAPI();
+        // Initialize page with utilities
+        const { api, userId, groupId } = PageUtils.initializePage({ 
+            requireAuth: true,
+            requireGroupId: true,
+            redirectOnMissingGroup: 'mySpheres.html'
+        });
+        
         const utils = new EditDeleteUtils(api);
+        const user = { userId: userId };
 
-        // Check authentication
-        if (!SessionManager.requireAuth()) {
-            // Will redirect if not authenticated
-        }
+        // Setup tab manager
+        const tabManager = new TabManager({ defaultTab: 'notes' });
+        tabManager.initFromURL(); // Support ?tab=decks in URL
 
-        const userId = SessionManager.getUserId();
-        const user = { userId: userId }; // Create user object for comparison
-        const urlParams = new URLSearchParams(window.location.search);
-        const groupId = parseInt(urlParams.get('groupId'));
-
-        if (!groupId) {
-            alert('No sphere selected');
-            location.href = 'mySpheres.html';
-        }
-
-        let currentTab = 'notes';
         let groupInfo = null;
 
         function goBack() {
-            location.href = `specificSphere.html?groupId=${groupId}`;
+            PageUtils.navigateTo('specificSphere.html', groupId);
         }
 
         // Load group info
@@ -345,46 +210,24 @@
         }
 
         function switchTab(tabName) {
-            currentTab = tabName;
-            
-            // Update tab buttons
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
-
-            // Update tab content
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            if (tabName === 'notes') {
-                document.getElementById('notesTab').classList.add('active');
-            } else {
-                document.getElementById('decksTab').classList.add('active');
-            }
+            tabManager.switchTab(tabName, event);
         }
 
         function openCreateModal() {
-            if (currentTab === 'notes') {
-                document.getElementById('createNoteModal').classList.add('active');
-            } else {
-                document.getElementById('createDeckModal').classList.add('active');
-            }
+            modalManager.openCreateModalForTab(tabManager.getCurrentTab());
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            // Reset form
-            if (modalId === 'createNoteModal') {
-                document.getElementById('createNoteForm').reset();
-            } else if (modalId === 'createDeckModal') {
-                document.getElementById('createDeckForm').reset();
-            }
+            modalManager.closeModal(modalId);
         }
+        
 
         async function handleCreateNote(event) {
-            event.preventDefault();
-            
             const title = document.getElementById('noteTitle').value.trim();
             const content = document.getElementById('noteContent').value.trim();
             
             if (!title || !content) {
+                event.preventDefault();
                 alert('Please fill in all required fields');
                 return;
             }
@@ -400,12 +243,11 @@
         }
 
         async function handleCreateDeck(event) {
-            event.preventDefault();
-            
             const title = document.getElementById('deckTitle').value.trim();
             const description = document.getElementById('deckDescription').value.trim();
             
             if (!title) {
+                event.preventDefault();
                 alert('Please enter a deck title');
                 return;
             }
@@ -418,6 +260,7 @@
                 [],
                 () => closeModal('createDeckModal')
             );
+
         }
 
         async function loadNotes() {
@@ -494,80 +337,19 @@
             await utils.deleteDeck(deckId, loadDecks);
         }
 
-        function openCreateModal() {
-            // Close any open modals first
-            document.querySelectorAll('.modal.active').forEach(modal => {
-                modal.classList.remove('active');
-                const form = modal.querySelector('form');
-                if (form) {
-                    form.reset();
-                    // Re-enable any disabled buttons
-                    const buttons = form.querySelectorAll('button');
-                    buttons.forEach(btn => {
-                        btn.disabled = false;
-                        if (btn.textContent.includes('Creating') || btn.textContent.includes('Updating')) {
-                            btn.textContent = btn.textContent.includes('Note') ? 
-                                (btn.closest('#editNoteModal') ? 'Update Note' : 'Create Note') :
-                                (btn.closest('#editDeckModal') ? 'Update Deck' : 'Create Deck');
-                        }
-                    });
-                }
+        // Modal event listeners for backdrop close
+        document.addEventListener('DOMContentLoaded', () => {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeModal(modal.id);
+                    }
+                });
             });
-            
-            // Small delay to ensure cleanup completes
-            setTimeout(() => {
-                let modalId;
-                if (currentTab === 'notes') {
-                    modalId = 'createNoteModal';
-                } else {
-                    modalId = 'createDeckModal';
-                }
-                
-                const modal = document.getElementById(modalId);
-                modal.classList.add('active');
-                
-                // Focus first input after modal is visible
-                setTimeout(() => {
-                    const firstInput = modal.querySelector('input, select, textarea');
-                    if (firstInput) {
-                        firstInput.focus();
-                    }
-                }, 100);
-            }, 50);
-        }
-
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (!modal) return;
-            
-            modal.classList.remove('active');
-            
-            // Reset form and button states
-            const form = modal.querySelector('form');
-            if (form) {
-                form.reset();
-                
-                // Reset submit button
-                const submitBtn = form.querySelector('button[type="submit"]');
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    // Reset text based on modal type
-                    if (modalId.includes('Note')) {
-                        submitBtn.textContent = modalId.includes('edit') ? 'Update Note' : 'Create Note';
-                    } else if (modalId.includes('Deck')) {
-                        submitBtn.textContent = modalId.includes('edit') ? 'Update Deck' : 'Create Deck';
-                    }
-                }
-            }
-        }
-
-        // Setup modal handlers
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal') && e.target.classList.contains('active')) {
-                closeModal(e.target.id);
-            }
         });
 
+        // Setup escape key for modals
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 const activeModal = document.querySelector('.modal.active');
