@@ -134,27 +134,19 @@
     </div>
 
     <script src="../scripts/space-init.js"></script>
+    <script src="../components/page-utils.js"></script>
     <script src="../api.js"></script>
     <script src="../session-manager.js"></script>
     <script>
-        const api = new PeerSphereAPI();
-        
-        // Check authentication
-        if (!SessionManager.requireAuth()) {
-            // Will redirect if not authenticated
-        }
-
-        const userId = SessionManager.getUserId();
-        const urlParams = new URLSearchParams(window.location.search);
-        const groupId = parseInt(urlParams.get('groupId'));
-
-        if (!groupId) {
-            alert('No sphere selected');
-            location.href = 'mySpheres.html';
-        }
+        // Initialize page with utilities
+        const { api, userId, groupId } = PageUtils.initializePage({ 
+            requireAuth: true,
+            requireGroupId: true,
+            redirectOnMissingGroup: 'mySpheres.html'
+        });
 
         function goBack() {
-            location.href = `specificSphere.html?groupId=${groupId}`;
+            PageUtils.navigateTo('specificSphere.html', groupId);
         }
 
         // Load group info

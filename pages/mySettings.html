@@ -8,225 +8,347 @@
     <link rel="stylesheet" href="../styles/space-theme.css">
     <title>My Settings - PeerSphere</title>
     <style>
-      body {
-        min-height: 100vh;
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      }
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
 
-      .home-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 40px 20px;
-      }
+        .profile-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
 
-      .header {
-        background: white;
-        border-radius: 15px;
-        padding: 30px;
-        margin-bottom: 30px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
 
-      .header h1 {
-        margin: 0 0 10px 0;
-        color: #333;
-      }
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
 
-      .header p {
-        color: #666;
-        margin: 0;
-      }
+        .profile-info h2 {
+            margin: 0 0 5px 0;
+            font-size: 1.8rem;
+            color: white;
+        }
 
-      .header .user-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 1px solid #eee;
-      }
+        .profile-info .email {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+        }
 
-      .stats-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-      }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
 
-      .stat-card {
-        background: white;
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        text-align: center;
-      }
+        .info-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
 
-      .stat-number {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #667eea;
-        margin: 10px 0;
-      }
+        .info-item .label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-      .stat-label {
-        color: #666;
-        font-size: 0.9rem;
-      }
+        .info-item .value {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
 
-      .navigation-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 20px;
-      }
+        .spheres-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
 
-      .nav-card {
-        background: white;
-        border-radius: 15px;
-        padding: 30px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-        text-decoration: none;
-        color: inherit;
-        display: block;
-      }
+        .spheres-section h2 {
+            margin: 0 0 20px 0;
+            color: white;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-      .nav-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      }
+        .sphere-count {
+            background: rgba(102, 126, 234, 0.3);
+            color: #a8b3ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
 
-      .nav-card-icon {
-        font-size: 3rem;
-        margin-bottom: 15px;
-      }
+        .spheres-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
 
-      .nav-card h3 {
-        margin: 0 0 10px 0;
-        color: #333;
-      }
+        .sphere-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
 
-      .nav-card p {
-        color: #666;
-        margin: 0;
-        font-size: 0.9rem;
-      }
+        .sphere-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
 
-      .logout-btn {
-        background: #dc3545;
-        color: white;
-        border: none;
-        padding: 10px 25px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: background 0.3s;
-      }
+        .sphere-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
 
-      .logout-btn:hover {
-        background: #c82333;
-      }
+        .sphere-name {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+        }
 
-      .loading {
-        text-align: center;
-        padding: 40px;
-        color: white;
-        font-size: 1.2rem;
-      }
+        .sphere-code {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .creator-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .actions-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .actions-section h2 {
+            margin: 0 0 20px 0;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1rem;
+        }
+
+        .loading-spinner::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
     </style>
 </head>
 <body>
     <div class="stars" id="stars"></div>
-    <button class="back-btn" onclick="location.href='homePage.html'" title="Back to Home">←</button>
     
     <div class="container">
-        <h1>⚙️ Personal Settings</h1>
-
-    <div class="settings-section">
-        <h2>Account Information</h2>
-        <div class="info-row">
-            <span class="info-label">Name:</span>
-            <span class="info-value" id="userName">Loading...</span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">Email:</span>
-            <span class="info-value" id="userEmail">Loading...</span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">User ID:</span>
-            <span class="info-value" id="userId">Loading...</span>
-        </div>
-    </div>
-
-        <div class="settings-section">
-            <h2>My Spheres</h2>
-            <div id="spheresList">Loading your spheres...</div>
+        <div class="header-section">
+            <button onclick="location.href='homePage.html'" class="btn-secondary" style="padding: 10px 20px;">
+                ← Back to Home
+            </button>
         </div>
 
-        <div class="settings-section">
+        <h1 style="margin-bottom: 30px;">⚙️ Settings</h1>
+
+        <!-- Profile Card -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar" id="userAvatar">👤</div>
+                <div class="profile-info">
+                    <h2 id="userName">Loading...</h2>
+                    <div class="email" id="userEmail">Loading...</div>
+                </div>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="label">User ID</div>
+                    <div class="value" id="userId">Loading...</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Account Type</div>
+                    <div class="value">Student</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Member Since</div>
+                    <div class="value" id="memberSince">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spheres Section -->
+        <div class="spheres-section">
+            <h2>
+                🌐 My Spheres
+                <span class="sphere-count" id="sphereCount">0</span>
+            </h2>
+            <div id="spheresList" class="spheres-grid">
+                <div class="loading-spinner">Loading your spheres</div>
+            </div>
+        </div>
+
+        <!-- Actions Section -->
+        <div class="actions-section">
             <h2>Account Actions</h2>
-            <button onclick="handleLogout()" class="btn-danger">Logout</button>
+            <div class="action-buttons">
+                <button onclick="location.href='myWork.html'" class="btn-primary">
+                    📝 View My Work
+                </button>
+                <button onclick="location.href='mySpheres.html'" class="btn-primary">
+                    🌐 Manage Spheres
+                </button>
+                <button onclick="handleLogout()" class="btn-danger">
+                    🚪 Logout
+                </button>
+            </div>
         </div>
-
-        <div id="message"></div>
     </div>
 
     <script src="../scripts/space-init.js"></script>
+    <script src="../components/page-utils.js"></script>
     <script src="../api.js"></script>
     <script src="../session-manager.js"></script>
     <script>
-        const api = new PeerSphereAPI();
+        // Initialize page with utilities
+        const { api, userId, userName, userEmail } = PageUtils.initializePage({ requireAuth: true });
         
-        // Check authentication
-        if (!SessionManager.requireAuth()) {
-            // Will redirect if not authenticated
-        }
-
         // Load user information
         function loadUserInfo() {
-            const userName = SessionManager.getUserName();
-            const userEmail = SessionManager.getUserEmail();
-            const userId = SessionManager.getUserId();
-
             document.getElementById('userName').textContent = userName;
             document.getElementById('userEmail').textContent = userEmail;
             document.getElementById('userId').textContent = userId;
+            
+            // Set avatar initial
+            document.getElementById('userAvatar').textContent = PageUtils.getUserInitial(userName);
+            
+            // Set member since date
+            document.getElementById('memberSince').textContent = PageUtils.formatDate(new Date(), { 
+                month: 'short', 
+                year: 'numeric' 
+            });
         }
 
         // Load user's spheres
         async function loadSpheres() {
-            const userId = SessionManager.getUserId();
             const container = document.getElementById('spheresList');
+            const countBadge = document.getElementById('sphereCount');
 
             try {
                 const groups = await api.getUserGroups(userId);
                 
+                countBadge.textContent = groups.length;
+                
                 if (groups.length === 0) {
-                    container.innerHTML = '<p style="color: #666;">You are not in any spheres yet.</p>';
+                    PageUtils.showEmptyState(
+                        container,
+                        '🌐',
+                        '',
+                        "You haven't joined any spheres yet.",
+                        { text: 'Join a Sphere', onClick: "location.href='joinSphere.html'" }
+                    );
                     return;
                 }
 
-                container.innerHTML = `<p><strong>You are a member of ${groups.length} sphere(s)</strong></p>`;
-                
-                const list = document.createElement('ul');
-                list.style.paddingLeft = '20px';
-                
-                groups.forEach(group => {
-                    const item = document.createElement('li');
-                    item.style.margin = '10px 0';
-                    item.innerHTML = `
-                        <strong>${group.name}</strong> (${group.courseCode})
-                        ${group.createdBy === userId ? '<span style="color: #667eea; font-size: 0.9em;"> - Creator</span>' : ''}
-                    `;
-                    list.appendChild(item);
-                });
-                
-                container.appendChild(list);
+                container.innerHTML = groups.map(group => `
+                    <div class="sphere-card" onclick="location.href='specificSphere.html?groupId=${group.groupId}'">
+                        <div class="sphere-card-header">
+                            <div>
+                                <div class="sphere-name">${PageUtils.escapeHtml(group.name)}</div>
+                                <div class="sphere-code">${PageUtils.escapeHtml(group.courseCode || 'No code')}</div>
+                            </div>
+                            ${group.createdBy === userId ? '<span class="creator-badge">👑 Creator</span>' : ''}
+                        </div>
+                    </div>
+                `).join('');
 
             } catch (error) {
                 console.error('Error loading spheres:', error);
-                container.innerHTML = '<p style="color: #dc3545;">Error loading spheres</p>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <p style="color: #ff6b6b;">Error loading spheres: ${PageUtils.escapeHtml(error.message)}</p>
+                    </div>
+                `;
             }
         }
 

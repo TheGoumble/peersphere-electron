@@ -150,14 +150,20 @@ class FormHandler {
      * @param {Array<string>} preserveFields - Field IDs to preserve after reset (e.g., ['noteGroup', 'deckGroup'])
      * @returns {Promise<boolean>}
      */
-    static async handleCreate(event, apiCall, reloadData, itemName = 'Item', preserveFields = []) {
+    static async handleCreate(event, apiCall, reloadData, itemName = 'Item', preserveFields = [], closeModal = null) {
         return this.handleSubmit(event, apiCall, reloadData, {
             loadingText: `Creating ${itemName}...`,
             successText: `✅ ${itemName} created successfully!`,
             errorPrefix: `❌ Failed to create ${itemName}: `,
             resetForm: true,
             preserveFields: preserveFields,
-            focusFirst: true
+            focusFirst: true,
+            showSuccessAlert: false,
+            afterSubmit: async (form, success) => {
+                if (success && closeModal) {
+                    closeModal();
+                }
+            }
         });
     }
 

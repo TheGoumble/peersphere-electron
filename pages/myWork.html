@@ -183,23 +183,22 @@
         </div>
     </div>
 
+    <script src="../components/page-utils.js"></script>
+    <script src="../components/modal-manager.js"></script>
+    <script src="../components/tab-manager.js"></script>
     <script src="../api.js"></script>
     <script src="../session-manager.js"></script>
     <script src="../utils/edit-delete-utils.js"></script>
     <script src="../components/form-handler.js"></script>
     <script src="../scripts/space-init.js"></script>
     <script>
-        const api = new PeerSphereAPI();
+        // Initialize page with utilities
+        const { api, userId } = PageUtils.initializePage({ requireAuth: true });
         const utils = new EditDeleteUtils(api);
 
-        // Check authentication
-        if (!SessionManager.requireAuth()) {
-            // Will redirect if not authenticated
-        }
+        // Setup tab manager
+        const tabManager = new TabManager({ defaultTab: 'notes' });
 
-        const userId = SessionManager.getUserId();
-
-        let currentTab = 'notes';
         let userGroups = [];
 
         // Load user groups for the dropdowns
@@ -212,7 +211,7 @@
                 const deckGroupSelect = document.getElementById('deckGroup');
                 
                 const options = userGroups.map(group => 
-                    `<option value="${group.groupId}">${group.name} (${group.courseCode || 'No Code'})</option>`
+                    `<option value="${group.groupId}">${PageUtils.escapeHtml(group.name)} (${PageUtils.escapeHtml(group.courseCode || 'No Code')})</option>`
                 ).join('');
                 
                 noteGroupSelect.innerHTML = '<option value="">-- Choose a Sphere --</option>' + options;
@@ -223,86 +222,15 @@
         }
 
         function switchTab(tabName) {
-            currentTab = tabName;
-            
-            // Update tab buttons
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
-
-            // Update tab content
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            if (tabName === 'notes') {
-                document.getElementById('notesTab').classList.add('active');
-            } else {
-                document.getElementById('decksTab').classList.add('active');
-            }
+            tabManager.switchTab(tabName, event);
         }
 
         function openCreateModal() {
-            // Close any open modals first
-            document.querySelectorAll('.modal.active').forEach(modal => {
-                modal.classList.remove('active');
-                const form = modal.querySelector('form');
-                if (form) {
-                    form.reset();
-                    // Re-enable any disabled buttons
-                    const buttons = form.querySelectorAll('button');
-                    buttons.forEach(btn => {
-                        btn.disabled = false;
-                        if (btn.textContent.includes('Creating') || btn.textContent.includes('Updating')) {
-                            btn.textContent = btn.textContent.includes('Note') ? 
-                                (btn.closest('#editNoteModal') ? 'Update Note' : 'Create Note') :
-                                (btn.closest('#editDeckModal') ? 'Update Deck' : 'Create Deck');
-                        }
-                    });
-                }
-            });
-            
-            // Small delay to ensure cleanup completes
-            setTimeout(() => {
-                let modalId;
-                if (currentTab === 'notes') {
-                    modalId = 'createNoteModal';
-                } else {
-                    modalId = 'createDeckModal';
-                }
-                
-                const modal = document.getElementById(modalId);
-                modal.classList.add('active');
-                
-                // Focus first input after modal is visible
-                setTimeout(() => {
-                    const firstInput = modal.querySelector('input, select, textarea');
-                    if (firstInput) {
-                        firstInput.focus();
-                    }
-                }, 100);
-            }, 50);
+            modalManager.openCreateModalForTab(tabManager.getCurrentTab());
         }
 
         function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (!modal) return;
-            
-            modal.classList.remove('active');
-            
-            // Reset form and button states
-            const form = modal.querySelector('form');
-            if (form) {
-                form.reset();
-                
-                // Reset submit button
-                const submitBtn = form.querySelector('button[type="submit"]');
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    // Reset text based on modal type
-                    if (modalId.includes('Note')) {
-                        submitBtn.textContent = modalId.includes('edit') ? 'Update Note' : 'Create Note';
-                    } else if (modalId.includes('Deck')) {
-                        submitBtn.textContent = modalId.includes('edit') ? 'Update Deck' : 'Create Deck';
-                    }
-                }
-            }
+            modalManager.closeModal(modalId);
         }
 
         async function handleCreateNote(event) {
@@ -313,8 +241,7 @@
             const content = document.getElementById('noteContent').value.trim();
             
             if (!groupId || !title || !content) {
-                alert('Please fill in all required fields');
-                return;
+                return; // Silent validation fail
             }
 
             await FormHandler.handleCreate(
@@ -335,8 +262,7 @@
             const description = document.getElementById('deckDescription').value.trim();
             
             if (!groupId || !title) {
-                alert('Please fill in all required fields');
-                return;
+                return; // Silent validation fail
             }
 
             await FormHandler.handleCreate(
@@ -394,14 +320,26 @@
         }
 
         function viewNote(noteId) {
-            // For now, just show the note content in an alert
-            // TODO: Create a dedicated note viewing page
-            console.log('View note:', noteId);
+            // Find the note data and open edit modal to view it
+            const container = document.getElementById('notesContainer');
+            const items = JSON.parse(container.getAttribute('data-items') || '[]');
+            const note = items.find(n => n.noteId === noteId);
+            
+            if (note) {
+                editNote(noteId, note.title, note.content);
+            }
         }
 
         function viewDeck(deckId) {
-            // Navigate to flashcard deck page
-            location.href = `group-flashcards.html?deckId=${deckId}`;
+            // Find the deck's group and navigate to peerStudy page
+            const container = document.getElementById('decksContainer');
+            const items = JSON.parse(container.getAttribute('data-items') || '[]');
+            const deck = items.find(d => d.deckId === deckId);
+            
+            if (deck && deck.groupId) {
+                // Navigate to peerStudy page for this group, on the decks tab
+                location.href = `peerStudy.html?groupId=${deck.groupId}&tab=decks`;
+            }
         }
 
         function editNote(noteId, title, content) {

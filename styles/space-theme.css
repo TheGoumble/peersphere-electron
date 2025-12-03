@@ -249,6 +249,15 @@ textarea::placeholder {
     pointer-events: auto;
 }
 
+/* Force all inputs in active modals to be interactive (fix Electron bug) */
+.modal.active input,
+.modal.active textarea,
+.modal.active select,
+.modal.active button {
+    pointer-events: auto !important;
+    user-select: text !important;
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;
